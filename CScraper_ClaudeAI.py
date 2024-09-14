@@ -5,7 +5,7 @@ import requests
 claude_api_key = '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'  # Replace with your Claude API key
 
 # Hard-coded GitHub API token for demonstration purposes
-GITHUB_API_TOKEN = 'your_github_api_token'  # Replace with your GitHub API token
+GITHUB_API_TOKEN = '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'  # Replace with your GitHub API token
 GITHUB_API_HEADERS = {
     'Authorization': f'token {GITHUB_API_TOKEN}',
     'Accept': 'application/vnd.github.v3+json'
@@ -132,7 +132,7 @@ def commit_changes_to_github(owner, repo, file_path, content, commit_message):
 
 def main():
     owner = "webrendhq"  # Replace with the GitHub user/organization
-    repo = "WebRendNew"  # Replace with the repository name
+    repo = "Test-Repo-for-CScraper"  # Replace with the repository name
 
     while True:
         # Retrieve and send the current repo contents to Claude AI
