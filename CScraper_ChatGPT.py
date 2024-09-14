@@ -5,7 +5,7 @@ from openai import OpenAI
 client = OpenAI(api_key='sk-2vYaBtHVSqx_D5skgFk4R4KCTEpxdDgy_eUxZ_1XHRT3BlbkFJcNY06aABBRSDN0eFW5M-UA60etJaBdaLG9ujj9MT8A')
 
 # Hard-coded GitHub API token for demonstration purposes
-GITHUB_API_TOKEN = 'your_github_api_token'  # Replace with your GitHub API token
+GITHUB_API_TOKEN = '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'  # Replace with your GitHub API token
 GITHUB_API_HEADERS = {
     'Authorization': f'token {GITHUB_API_TOKEN}',
     'Accept': 'application/vnd.github.v3+json'
