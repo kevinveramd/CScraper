@@ -2,7 +2,7 @@ import os
 import requests
 
 # Set your Anthropic Claude API key
-claude_api_key = 'your_claude_api_key'  # Replace with your Claude API key
+claude_api_key = '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'  # Replace with your Claude API key
 
 # Hard-coded GitHub API token for demonstration purposes
 GITHUB_API_TOKEN = 'your_github_api_token'  # Replace with your GitHub API token
