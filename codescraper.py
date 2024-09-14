@@ -1,4 +1,9 @@
+import os
 import requests
+import openai
+
+# Set your OpenAI API key
+openai.api_key = 'sk-2vYaBtHVSqx_D5skgFk4R4KCTEpxdDgy_eUxZ_1XHRT3BlbkFJcNY06aABBRSDN0eFW5M-UA60etJaBdaLG9ujj9MT8A'  # Replace with your OpenAI API key
 
 def get_github_repo_contents(owner, repo):
     # Initialize an array to store contents of all files
@@ -73,13 +78,39 @@ def explore_directory(owner, repo, path):
 
     return subdirectory_contents
 
-# Example usage
-if __name__ == "__main__":
-    owner = "webrendhq"  # Replace with the GitHub user/organization
-    repo = "WebRendNew"  # Replace with the repository name
+def send_to_chatgpt(prompt):
+    response = openai.ChatCompletion.create(
+        model="gpt-4",  # Replace with your model choice
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+    return response['choices'][0]['message']['content']
+
+def main():
+    owner = "octocat"  # Replace with the GitHub user/organization
+    repo = "Hello-World"  # Replace with the repository name
     repo_contents = get_github_repo_contents(owner, repo)
-    
-    # Display the fetched contents stored in the array
+
+    # Create a single prompt with all file contents
+    prompt = "Here are the contents of the repository files:\n"
     for file_info in repo_contents:
-        print(f"\nFile: {file_info['filename']}")
-        print(f"Content: {file_info['content']}...")
+        prompt += f"\n--- File: {file_info['filename']} ---\n"
+        prompt += f"{file_info['content']}\n"
+
+    # Send the contents to ChatGPT
+    response = send_to_chatgpt(prompt)
+    print("\nChatGPT Response:\n", response)
+
+    # Clear the terminal
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+    # Prompt the user
+    while True:
+        user_input = input("What do you need help with?\n")
+        response = send_to_chatgpt(user_input)
+        print("\nChatGPT Response:\n", response)
+
+if __name__ == "__main__":
+    main()
