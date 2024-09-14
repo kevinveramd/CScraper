@@ -4,6 +4,13 @@ import requests
 # Set your Anthropic Claude API key
 claude_api_key = 'your_claude_api_key'  # Replace with your Claude API key
 
+# Hard-coded GitHub API token for demonstration purposes
+GITHUB_API_TOKEN = 'your_github_api_token'  # Replace with your GitHub API token
+GITHUB_API_HEADERS = {
+    'Authorization': f'token {GITHUB_API_TOKEN}',
+    'Accept': 'application/vnd.github.v3+json'
+}
+
 # Function to send prompts to Claude AI
 def send_to_claude(prompt):
     headers = {
@@ -32,7 +39,7 @@ def get_github_repo_contents(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}/contents"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=GITHUB_API_HEADERS)
 
         # Check if the request was successful
         if response.status_code == 200:
@@ -74,7 +81,7 @@ def explore_directory(owner, repo, path):
     subdirectory_contents = []
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=GITHUB_API_HEADERS)
 
         if response.status_code == 200:
             contents = response.json()
@@ -97,29 +104,67 @@ def explore_directory(owner, repo, path):
 
     return subdirectory_contents
 
+def commit_changes_to_github(owner, repo, file_path, content, commit_message):
+    # Get the SHA of the file
+    url = f"https://api.github.com/repos/{owner}/{repo}/contents/{file_path}"
+    response = requests.get(url, headers=GITHUB_API_HEADERS)
+
+    if response.status_code == 200:
+        sha = response.json()['sha']
+    else:
+        print(f"Failed to retrieve file SHA. Status code: {response.status_code}")
+        return
+
+    # Create the payload for the commit
+    data = {
+        "message": commit_message,
+        "content": content.encode('utf-8').decode('unicode_escape'),
+        "sha": sha
+    }
+
+    # Make the PUT request to update the file
+    response = requests.put(url, headers=GITHUB_API_HEADERS, json=data)
+
+    if response.status_code == 200:
+        print(f"Successfully committed changes to {file_path}")
+    else:
+        print(f"Failed to commit changes. Status code: {response.status_code}, {response.text}")
+
 def main():
     owner = "webrendhq"  # Replace with the GitHub user/organization
     repo = "WebRendNew"  # Replace with the repository name
-    repo_contents = get_github_repo_contents(owner, repo)
 
-    # Create a single prompt with all file contents
-    prompt = "Here are the contents of the repository files:\n"
-    for file_info in repo_contents:
-        prompt += f"\n--- File: {file_info['filename']} ---\n"
-        prompt += f"{file_info['content']}\n"
-
-    # Send the consolidated content to Claude AI
-    response = send_to_claude(prompt)
-    print("\nClaude AI Response:\n", response)
-
-    # Clear the terminal
-    os.system('cls' if os.name == 'nt' else 'clear')
-
-    # Prompt the user
     while True:
-        user_input = input("What do you need help with?\n")
+        # Retrieve and send the current repo contents to Claude AI
+        repo_contents = get_github_repo_contents(owner, repo)
+        prompt = "Here are the contents of the repository files:\n"
+        for file_info in repo_contents:
+            prompt += f"\n--- File: {file_info['filename']} ---\n"
+            prompt += f"{file_info['content']}\n"
+
+        # Send the consolidated content to Claude AI
+        response = send_to_claude(prompt)
+        print("\nClaude AI Response:\n", response)
+
+        # Clear the terminal
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+        # Ask user for input on what they want to change
+        user_input = input("What would you like to change? (Type 'exit' or 'done' to finish)\n")
+        if user_input.lower() in ["exit", "done"]:
+            print("Exiting...")
+            break
+
+        # Send user input to Claude AI for further processing
         response = send_to_claude(user_input)
         print("\nClaude AI Response:\n", response)
+
+        # Ask if the user wants to commit changes
+        if "commit" in user_input.lower():
+            file_path = input("Enter the file path to commit: ")
+            content = input("Enter the new content for the file: ")
+            commit_message = input("Enter the commit message: ")
+            commit_changes_to_github(owner, repo, file_path, content, commit_message)
 
 if __name__ == "__main__":
     main()
