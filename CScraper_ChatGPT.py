@@ -2,7 +2,6 @@ import os
 import requests
 from openai import OpenAI
 
-client = OpenAI(api_key='')
 
 # Set your OpenAI API key
   # Replace with your OpenAI API key
