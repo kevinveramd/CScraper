@@ -82,4 +82,4 @@ if __name__ == "__main__":
     # Display the fetched contents stored in the array
     for file_info in repo_contents:
         print(f"\nFile: {file_info['filename']}")
-        print(f"Content: {file_info['content'][:200]}...")  # Display first 200 characters of each file content
+        print(f"Content: {file_info['content']}...")
